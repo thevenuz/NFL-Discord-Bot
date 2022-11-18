@@ -6,7 +6,7 @@ from datetime import datetime
 
 class BaseLogger:
     def __init__(self) -> None:
-        self.file_prefix="nflbot.logger.baselogger"
+        self.filePrefix="nflbot.logger.baselogger"
 
     def loggger_init(self):
         try:
