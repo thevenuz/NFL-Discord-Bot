@@ -1,9 +1,9 @@
 import aiohttp
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 from typing import Dict, List
 from nflbot.logger.baselogger import BaseLogger
-from nflbot.models.score import Score, Game
+from nflbot.models.score import Score, Game, GameStatus
 from nflbot.utils.configutil import ConfigUtil
 
 class ScoreImpl:
@@ -17,8 +17,8 @@ class ScoreImpl:
             self.logger.info("%s.get_live_score method invoked", self.filePrefix)
 
             today = datetime.today()
-            startDate = today-timedelta(days=4)
-            endDate = today+timedelta(days=1)
+            startDate = today - timedelta(days=4)
+            endDate = today + timedelta(days=1)
 
             startDate = startDate.strftime("%Y%m%d")
             endDate = endDate.strftime("%Y%m%d")
@@ -49,18 +49,34 @@ class ScoreImpl:
             homeTeam = Score()
             awayTeam = Score()
 
-            for event in result["events"].reverse():
+            events= result["events"]
+            #events.sort(key=lambda item:item['date'], reverse=True)
+
+            today = (datetime.combine(datetime.today(), time.min))
+            nextDay = (datetime.combine(datetime.today(), time.max) + timedelta(hours=3))
+
+            latestEvents = sorted(filter(lambda x: datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")  >= today and datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ") < nextDay, events),
+                                  key=lambda x: x["date"], reverse=True)
+
+            if latestEvents:
+                events = latestEvents
+            else:
+                events.sort(key=lambda item:item['date'], reverse=True)
+
+            for event in events:
                 if event:
+                    print(type(event["date"]))
                     for competition in event["competitions"]:
                         if competition:
-                            homeTeam = await self.__fill_game_details(competition["competitors"][0])
-                            awayTeam = await self.__fill_game_details(competition["competitors"][1])
+                            homeTeam = await self.__fill_game_details(competition["competitors"][0], event["date"])
+                            awayTeam = await self.__fill_game_details(competition["competitors"][1], event["date"])
 
                             game["home"] = homeTeam
                             game["away"] = awayTeam
                             games.append(game)
 
-                            if games.count >= 3:
+
+                            if not latestEvents and games.count >= 3:
                                 break
 
             return games
@@ -70,14 +86,26 @@ class ScoreImpl:
             raise e
         
 
-    async def __fill_game_details(self, gameData: Dict) -> Score:
+    async def __fill_game_details(self, gameData: Dict, gameDate:str) -> Score:
         try:
             self.logger.info("%s.__fill_game_details method invoked", self.filePrefix)
 
             game = Score()
 
             game.Score = gameData["score"]
-            game.Winner = gameData["winner"]
+
+            thresholdTime= datetime.utcnow()
+
+            if "winner" in gameData:
+                game.Winner = gameData["winner"]
+                game.Status = GameStatus.Completed
+
+            else:
+                if (thresholdTime >= datetime.strptime(gameDate, "%Y-%m-%dT%H:%MZ")):
+                    game.Status = GameStatus.Ongoing
+                else:
+                    game.Status = GameStatus.YetToStart
+
 
             game.Team.Name = gameData["team"]["name"]
             game.Team.DisplayName = gameData["team"]["displayName"]

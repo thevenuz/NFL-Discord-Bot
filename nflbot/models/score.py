@@ -1,6 +1,11 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Dict, Any
+import enum
 
+class GameStatus(enum.Enum):
+    Completed= "completed"
+    Ongoing = "ongoing"
+    YetToStart = "yettostart"
 
 @dataclass 
 class Team:
@@ -12,8 +17,10 @@ class Team:
 class Score:
     Team: Team = Team()
     Score: int = 0
-    Winner: bool= False
+    Winner: bool = False
+    Status : GameStatus = GameStatus.YetToStart
 
 @dataclass 
 class Game:
-    Game: Dict[str, Score] = {}
+    Game: dict[str, Score] = field(default_factory=dict)
+
