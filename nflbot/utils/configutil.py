@@ -42,7 +42,7 @@ class ConfigUtil:
             rootDirectory=os.path.dirname(__file__)
             configDirectory=Path(rootDirectory).parents[1]
 
-            filePath = os.path.join(configDirectory, "config", "botconfig.json")
+            filePath = os.path.join(configDirectory, "config", "settings.json")
 
             async with aiofiles.open(filePath, mode="r") as f:
                 result = json.loads(await f.read())
