@@ -18,17 +18,22 @@ async def live_score(ctx: lightbulb.SlashContext) -> None:
     try:
         logger.info("%s.live_score method invoked for guild: %s", filePrefix, ctx.guild_id)
 
-        result = await ScoreImpl().get_live_score()
+        status, result = await ScoreImpl().get_live_score()
 
         if result:
-            if any(game["home"].Status == GameStatus.Ongoing for game in result):
-                embed= hikari.Embed(title=f"GAMES:", color=0Xff500a)
+            if status == GameStatus.Ongoing:
+                embed= hikari.Embed(title=f"LIVE SCORE:", color=0Xff500a)
+            
+            else:
+                embed= hikari.Embed(title=f"RECENT GAMES:", color=0Xff500a)
+            msg = ""
+            for game in result:
+                
+                msg= f'{msg}{game["home"].Team.Name} (**{game["home"].Score}**) - (**{game["away"].Score}** {game["away"].Team.Name})\n'
 
-                for game in result:
-                    
-                    returnString = f'{game["home"]["team"].Name}'
+        embed.add_field(name=f"**RESULTS**", value=f"{msg}", inline=False)
 
-                    embed.add_field(name=f"**ONGOING GAMES**", value=f"{msgs['set:channel']}{msgs['set:channel:ex']}", inline=False)
+        await ctx.respond(embed=embed)
 
     except Exception as e:
         logger.fatal("Exception occured in %s.live_score method for guild: %s", filePrefix, ctx.guild_id, exc_info=1)

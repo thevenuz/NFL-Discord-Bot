@@ -13,7 +13,7 @@ class ScoreImpl:
         self.logger=BaseLogger().loggger_init()
 
 
-    async def get_live_score(self) -> List[Game]:
+    async def get_live_score(self) -> tuple[GameStatus, List[Game]]:
         try:
             self.logger.info("%s.get_live_score method invoked", self.filePrefix)
 
@@ -28,7 +28,22 @@ class ScoreImpl:
 
             apiUrl = settings.ApiEndpoint
 
-            req = f"{apiUrl}{startDate}-{endDate}"
+            req = apiUrl 
+
+            #first try to get ongoing game details
+            async with aiohttp.ClientSession() as session:
+                async with session.get(req) as response:
+                    result = json.loads(await response.text())
+
+            hasLiveGames = await self.__check_for_live_games(result["events"])
+
+            if hasLiveGames:
+                games = await self.__parse_game_data(result)
+
+                return GameStatus.Ongoing, games
+
+            
+            req = f"{apiUrl}?limit=30&dates={startDate}-{endDate}"
 
             async with aiohttp.ClientSession() as session:
                 async with session.get(req) as response:
@@ -36,18 +51,34 @@ class ScoreImpl:
 
             games = await self.__parse_game_data(result)
             
-            filteredGames = list(filter(lambda x: x["home"].Status == GameStatus.Ongoing, games))
-
-            if filteredGames:
-                return filteredGames
-
-            return games
+           
+            return GameStatus.Completed, games
 
         except Exception as e:
             self.logger.fatal("Exception occured in %s.get_live_score method", exc_info=1)
             raise e
         
-    async def __parse_game_data(self, result: Dict) -> List[Game]:
+    async def __check_for_live_games(self, events: Dict) -> bool:
+        try:
+            self.logger.info("%s.__check_for_live_games method invoked", self.filePrefix)
+
+            currentTime= datetime.utcnow()
+            thresholdTime = datetime.utcnow() + timedelta(hours=5)
+            
+            if (currentTime >= datetime.strptime(events[0]["date"], "%Y-%m-%dT%H:%MZ")):
+                return True
+
+            elif (datetime.strptime(events[0]["date"], "%Y-%m-%dT%H:%MZ") >= thresholdTime):
+                return False
+
+            return False
+        
+        except Exception as e:
+            self.logger.fatal("Exception occured in %s.__check_for_live_games method",self.filePrefix, exc_info=1)
+            raise e
+        
+    
+    async def __parse_game_data(self, result: Dict, hasLiveGames: bool = False) -> List[Game]:
         try:
             self.logger.info("%s.__parse_game_data method invoked", self.filePrefix)
 
@@ -59,18 +90,10 @@ class ScoreImpl:
 
             events= result["events"]
 
-            today = (datetime.combine(datetime.today(), time.min))
-            nextDay = (datetime.combine(datetime.today(), time.max) + timedelta(hours=3))
-
-            latestEvents = sorted(filter(lambda x: datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ")  >= today and datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ") < nextDay, events),
-                                  key=lambda x: x["date"])
-
-            latestEventsCopy= deepcopy(latestEvents)
-
-            if latestEvents:
-                events = latestEvents
-            else:
-                events.sort(key=lambda item:item['date'], reverse=True)
+            if not hasLiveGames:
+                events = list(filter(lambda x: datetime.strptime(x["date"], "%Y-%m-%dT%H:%MZ") <= datetime.utcnow(), events))
+                
+                events.sort(key=lambda item:item["date"], reverse=True)
 
             for event in events:
                 if event:
@@ -84,7 +107,7 @@ class ScoreImpl:
                             
                             games.append(deepcopy(game))
 
-                            if not latestEventsCopy and len(games) >= 3:
+                            if not hasLiveGames and len(games) >= 5:
                                 return games
 
             return games
