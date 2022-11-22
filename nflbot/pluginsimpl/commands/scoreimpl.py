@@ -64,11 +64,18 @@ class ScoreImpl:
 
             currentTime= datetime.utcnow()
             thresholdTime = datetime.utcnow() + timedelta(hours=5)
+
+            competitions = list(filter(lambda x: x["competitions"], events))
+
+            notCompletedEvents = list(filter(lambda x: x["status"]["type"]["completed"] == False, competitions))
             
-            if (currentTime >= datetime.strptime(events[0]["date"], "%Y-%m-%dT%H:%MZ")):
+            if not notCompletedEvents:
+                return False
+            
+            if (currentTime >= datetime.strptime(notCompletedEvents[0]["date"], "%Y-%m-%dT%H:%MZ")):
                 return True
 
-            elif (datetime.strptime(events[0]["date"], "%Y-%m-%dT%H:%MZ") >= thresholdTime):
+            elif (datetime.strptime(notCompletedEvents[0]["date"], "%Y-%m-%dT%H:%MZ") >= thresholdTime):
                 return False
 
             return False

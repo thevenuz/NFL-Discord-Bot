@@ -21,17 +21,19 @@ async def live_score(ctx: lightbulb.SlashContext) -> None:
         status, result = await ScoreImpl().get_live_score()
 
         if result:
+            embed= hikari.Embed(color=0Xb3ffff)
             if status == GameStatus.Ongoing:
-                embed= hikari.Embed(title=f"LIVE SCORE:", color=0Xff500a)
+                title= "LIVESCORE"
             
             else:
-                embed= hikari.Embed(title=f"RECENT GAMES:", color=0Xff500a)
+                title= "RECENT GAMES"
+
             msg = ""
             for game in result:
                 
-                msg= f'{msg}{game["home"].Team.Name} (**{game["home"].Score}**) - (**{game["away"].Score}** {game["away"].Team.Name})\n'
+                msg= f'{msg}\n\n**{game["home"].Team.DisplayName} ({game["home"].Score})** - **({game["away"].Score}) {game["away"].Team.DisplayName}**'
 
-        embed.add_field(name=f"**RESULTS**", value=f"{msg}", inline=False)
+        embed.add_field(name=f"{title}", value=f"{msg}", inline=False)
 
         await ctx.respond(embed=embed)
 
