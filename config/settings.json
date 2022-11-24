@@ -1,3 +1,4 @@
 {
-    "ApiEnpoint": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard"
+    "ApiEnpoint": "https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard",
+    "LogLevel": "ERROR"
 }

@@ -56,4 +56,15 @@ class ConfigUtil:
             raise e
         
     
-# https://site.api.espn.com/apis/site/v2/sports/football/nfl/scoreboard?limit=1000&dates=20221114-20221115
+    async def get_log_channels(self) -> tuple[str, str]:
+        try:
+            self.logger.info("%s.get_log_channels method invoked", self.filePrefix)
+
+            config = self.load_config()
+
+            return config.PublicLogChannel, config.PrivateLogChannel
+        
+        except Exception as e:
+            self.logger.fatal("Exception occured in %s.get_log_channels method", self.filePrefix, exc_info=1)
+            raise e
+        
