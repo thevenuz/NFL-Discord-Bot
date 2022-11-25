@@ -1,0 +1,9 @@
+version: "3.8"
+
+services:
+  nflbot:
+    build: ./
+    image: thevenuz/nflbot:master
+    volumes: 
+      - ../config:/app/config
+      - ../logs:/app/logs
