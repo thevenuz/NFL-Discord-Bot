@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/NFL-Discord-Bot/static/css/main.1a639f14.css",
+    "main.js": "/NFL-Discord-Bot/static/js/main.a402b40d.js",
+    "index.html": "/NFL-Discord-Bot/index.html",
+    "main.1a639f14.css.map": "/NFL-Discord-Bot/static/css/main.1a639f14.css.map",
+    "main.a402b40d.js.map": "/NFL-Discord-Bot/static/js/main.a402b40d.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1a639f14.css",
+    "static/js/main.a402b40d.js"
+  ]
+}
