@@ -11,8 +11,8 @@ root.render(
     <HashRouter>
       <App />
     </HashRouter>
-{/*       
-    </BrowserRouter> */}
+      
+     {/* </BrowserRouter> */}
   </React.StrictMode>
 );
 

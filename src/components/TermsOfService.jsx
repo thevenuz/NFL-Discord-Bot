@@ -54,7 +54,7 @@ const TermsOfService = () => {
           </ol>
         </div>
         <div>
-          <Link to="/privacy-policy">
+          <Link to="/NFL-Discord-Bot/privacy-policy">
             <p className="underline underline-offset-4 text-blue-200">
               Check Privacy Policy
             </p>

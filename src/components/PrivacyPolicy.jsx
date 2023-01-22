@@ -66,7 +66,7 @@ const PrivacyPolicy = () => {
           </ul>
         </div>
         <div>
-          <Link to="/terms-of-service">
+          <Link to="/NFL-Discord-Bot/terms-of-service">
             <p className='underline underline-offset-4 text-blue-200'>Check Terms of Service</p>
           </Link>
         </div>

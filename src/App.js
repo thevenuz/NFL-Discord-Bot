@@ -10,8 +10,8 @@ function App() {
         <Header />
         <Routes>
           <Route path="/" element={<PrivacyPolicy />} />
-          <Route path="privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="terms-of-service" element={<TermsOfService />} />
+          <Route path="/NFL-Discord-Bot/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/NFL-Discord-Bot/terms-of-service" element={<TermsOfService />} />
         </Routes>
         <Footer />
     </div>
