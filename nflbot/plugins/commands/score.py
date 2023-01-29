@@ -33,9 +33,12 @@ async def live_score(ctx: lightbulb.SlashContext) -> None:
                 
                 msg= f'{msg}\n\n**{game["home"].Team.DisplayName} ({game["home"].Score})** - **({game["away"].Score}) {game["away"].Team.DisplayName}**'
 
-        embed.add_field(name=f"{title}", value=f"{msg}", inline=False)
+            embed.add_field(name=f"{title}", value=f"{msg}", inline=False)
 
-        await ctx.respond(embed=embed)
+            await ctx.respond(embed=embed)
+
+        else:
+            await ctx.respond(embed=hikari.Embed(title=f"Error!", description=f"Bot could not find any live games or recent scores!", color=0xFF0000))
 
     except Exception as e:
         logger.fatal("Exception occured in %s.live_score method for guild: %s", filePrefix, ctx.guild_id, exc_info=1)

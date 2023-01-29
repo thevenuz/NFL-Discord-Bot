@@ -18,7 +18,7 @@ class ScoreImpl:
             self.logger.info("%s.get_live_score method invoked", self.filePrefix)
 
             today = datetime.today()
-            startDate = today - timedelta(days=4)
+            startDate = today - timedelta(days=7)
             endDate = today + timedelta(days=1)
 
             startDate = startDate.strftime("%Y%m%d")
