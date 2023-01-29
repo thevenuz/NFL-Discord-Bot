@@ -19,6 +19,7 @@ async def help(ctx: lightbulb.SlashContext):
 
         embed.add_field(name="ABOUT", value="A simple bot that can fetch livescore/recent games score of NFL league with a single command.", inline= False)
         embed.add_field(name="Commands:", value="`/livescore` : only command of the bot which is used for getting live score/ score of recently completed games", inline=False)
+        embed.add_field(name="Support server:", value="")
 
         await ctx.respond(embed=embed)
     
