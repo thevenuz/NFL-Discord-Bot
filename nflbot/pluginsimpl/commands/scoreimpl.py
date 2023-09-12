@@ -114,7 +114,7 @@ class ScoreImpl:
                             
                             games.append(deepcopy(game))
 
-                            if not hasLiveGames and len(games) >= 5:
+                            if not hasLiveGames and len(games) >= 10:
                                 return games
 
             return games
